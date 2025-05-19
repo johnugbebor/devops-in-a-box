@@ -8,6 +8,7 @@ on:
       - 'bootstrap/**'
       - 'terraform/envs/**/**'
       - '.github/workflows/ci-cd.yaml'
+      - 'scripts/**'
 
 permissions:
   id-token: write
