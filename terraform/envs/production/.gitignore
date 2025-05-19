@@ -1,4 +1,5 @@
 .idea/
+Seun-Terraform/terraform.tfstate
 *.tfstate
 *.tfstate.backup
 .terraform

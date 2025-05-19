@@ -10,9 +10,7 @@ This project provisions a multi-environment (staging and production) AWS EKS inf
 .
 ├── bootstrap/                     # Terraform config to create S3 backend and DynamoDB for locking
 ├── terraform/
-│   ├── modules/
-│   │   ├── vpc/                   # VPC module (wraps official terraform-aws-modules/vpc/aws)
-│   │   └── eks/                   # EKS module (wraps official terraform-aws-modules/eks/aws)
+│   │                                     
 │   └── envs/
 │       ├── staging/               # Staging environment configuration
 │       └── production/            # Production environment configuration

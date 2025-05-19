@@ -18,3 +18,15 @@ variable "public_subnet_cidr_blocks" {
   type        = list(string)
 
 }
+variable "region" {
+  type = string
+}
+
+variable "cluster_name" {
+  type = string
+
+}
+
+variable "vpc_id" {
+  type = string
+}

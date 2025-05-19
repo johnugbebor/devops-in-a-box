@@ -1,12 +1,12 @@
-region         = "eu-west-1"
-cluster_name   = "devops-eks-demo-production"
+region         = "eu-west-2"
+cluster_name   = "devops-eks-demo-prod"
 vpc_name       = "prod_vpc"
 vpc_cidr_block = "10.1.0.0/16"
 
 private_subnet_cidr_blocks = [
-  "10.1.1.0/22",
-  "10.1.5.0/22",
-  "10.1.9.0/22"
+  "10.1.0.0/22",
+  "10.1.4.0/22",
+  "10.1.8.0/22"
 ]
 
 public_subnet_cidr_blocks = [
