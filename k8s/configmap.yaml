@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: custom-html
+  namespace: demo
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html>
+        <head>
+            <title>This is A Test</title>
+        </head>
+        <body>
+            <h1 style="color: chocolate;">Hello GuyS, It's Just A Test</h1>
+            <h2>I love My Job As a DevOps Engineer!! :-)</h2>
+        </body>
+    </html>

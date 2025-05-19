@@ -1,0 +1,129 @@
+name: Create S3 Bucket For Terraform Backend + Provision EKS Cluster + CI/CD to EKS
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'bootstrap/**'
+      - 'terraform/envs/**/**'
+      - '.github/workflows/ci-cd.yaml'
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: us-east-1
+  BUCKET_NAME: tfstate-bucket-devops-demo-01
+
+
+jobs:
+  bootstrap:
+    name: Create S3 Bucket for Terraform Backend
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.0
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Check if S3 bucket exists
+        id: check_bucket
+        run: |
+          if aws s3api head-bucket --bucket "tfstate-bucket-devops-demo-01" 2>/dev/null; then
+            echo "exists=true" >> $GITHUB_ENV
+          else
+            echo "exists=false" >> $GITHUB_ENV
+          fi
+
+      - name: Init & Apply Bootstrap
+        if: steps.check_bucket.outputs.exists == 'false'
+        working-directory: bootstrap
+        run: |
+          terraform init
+          terraform apply -auto-approve -input=false
+
+  provision:
+    name: Provision EKS
+    runs-on: ubuntu-latest
+    needs: bootstrap
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.0
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Terraform Init Staging
+        run: |
+          terraform -chdir=terraform/envs/staging init \
+            -backend-config="bucket=tfstate-bucket-devops-demo-01" \
+            -backend-config="key=staging/eks/terraform.tfstate" \
+            -backend-config="region=us-east-1"
+
+      - name: Terraform Validate Staging
+        run: terraform -chdir=terraform/envs/staging validate
+
+      - name: Terraform Init Production
+        run: |
+          terraform -chdir=terraform/envs/production init \
+            -backend-config="bucket=tfstate-bucket-devops-demo-01" \
+            -backend-config="key=production/eks/terraform.tfstate" \
+            -backend-config="region=us-east-1"
+
+      - name: Terraform Validate Production
+        run: terraform -chdir=terraform/envs/production validate
+
+
+      - name: Terraform Apply Staging Deployment
+        working-directory: terraform/envs/staging
+        run: terraform apply -auto-approve -input=false
+
+      - name: Terraform Apply Production Deployment
+        working-directory: terraform/envs/production
+        run: terraform apply -auto-approve -input=false
+
+  Deploy-EKS:
+    name: Deploy A Sample Application To  EKS
+    runs-on: ubuntu-latest
+    needs: provision
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v3
+
+      - name: Deploy to Staging EKS
+        run: ./scripts/deploy.sh staging us-east-1
+
+      - name: Deploy to Production EKS
+        run: ./scripts/deploy.sh production eu-west-1
+
