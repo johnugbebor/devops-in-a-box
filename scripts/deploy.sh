@@ -23,7 +23,7 @@ kubectl apply -f k8s/service.yaml
 
 echo "Installing Helm and Monitoring Stack..."
 curl -s https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
-helm repo add prometheus-community <https://prometheus-community.github.io/helm-charts>
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm search repo prometheus-community
 helm repo update
 helm upgrade --install prometheus prometheus-community/kube-prometheus-stack -n monitoring --create-namespace
