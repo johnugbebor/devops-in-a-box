@@ -111,4 +111,4 @@ git push origin main
 ##  Prepared by
 ** John Ugbebor **  
 DevOps Engineer  
-GitHub: [github.com/yourprofile](https://github.com/yourprofile)
+GitHub: https://github.com/johnugbebor/devops-in-a-box.git
