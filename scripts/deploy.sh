@@ -10,7 +10,11 @@ if [[ -z "$ENV" || -z "$REGION" ]]; then
   exit 1
 fi
 
-CLUSTER_NAME="devops-eks-demo-$ENV"
+if [ "$ENV" = "production" ]; then
+  CLUSTER_NAME="devops-eks-demo-prod"
+else
+  CLUSTER_NAME="devops-eks-demo-$ENV"
+fi
 
 echo "Updating kubeconfig for $ENV in $REGION..."
 aws eks update-kubeconfig --name "$CLUSTER_NAME" --region "$REGION"
