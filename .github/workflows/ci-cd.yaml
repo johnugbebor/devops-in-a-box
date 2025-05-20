@@ -139,5 +139,5 @@ jobs:
         run: ./scripts/deploy.sh staging us-east-1
 
       - name: Deploy to Production EKS
-        run: ./scripts/deploy.sh production eu-west-1
+        run: ./scripts/deploy.sh production eu-west-2
 
